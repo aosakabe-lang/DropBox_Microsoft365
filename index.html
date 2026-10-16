@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropboxデータ移行 提案書</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #eff6ff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --bg-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --success-light: #ecfdf5;
+            --warning-color: #f59e0b;
+            --warning-light: #fffbeb;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+        .header-bar { background-color: var(--primary-color); height: 6px; }
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .card {
+            background: var(--surface-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 30px;
+        }
+        h1 { font-size: 1.5rem; color: #0f172a; margin: 0 0 20px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        h2 { font-size: 1.1rem; color: #0f172a; margin: 24px 0 12px; border-left: 4px solid var(--primary-color); padding-left: 8px; }
+        .alert-box {
+            background-color: var(--warning-light);
+            border-left: 4px solid var(--warning-color);
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.9rem; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: top; }
+        th { background-color: #f1f5f9; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+        .row-recommended { background-color: var(--primary-light); }
+        .badge {
+            display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 4px;
+        }
+        .badge-success { background-color: var(--success-light); color: var(--success-color); border: 1px solid #a7f3d0; }
+        .proposal-box { background-color: var(--success-light); border: 1px solid #a7f3d0; border-radius: 6px; padding: 20px; }
+        .cost-amount { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
+        ul { padding-left: 20px; margin: 10px 0 0; }
+        li { margin-bottom: 6px; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+    <div class="header-bar"></div>
+    <div class="container">
+        <div class="card">
+            <h1>Drop Boxデータ移行 提案書</h1>
+
+            <h2>1. 現状と課題</h2>
+            <p style="font-size: 0.95rem;">現行Dropbox Essentialsからの業務データ移行にあたり、Microsoft公式「移行マネージャー」の使用を計画していましたが、以下のエラーが発生しています。</p>
+            <div class="alert-box">
+                <strong>課題：</strong> 移行マネージャーの要件…管理者権限付Dropbox Standard以上。<br>現在のEssentialsプランでは連携不可。
+            </div>
+
+            <h2>2. 移行手法の比較</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>手法</th>
+                        <th>概要と評価</th>
+                        <th>コスト</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="row-recommended">
+                        <td><strong>【案A】Essentials→ Standard一時アップグレード</strong><br><span class="badge badge-success">候補</span></td>
+                        <td>1ヶ月のみDropbox Standardに変更し、公式ツールで直接転送。<br>PCに負荷をかけず最速・安全。フォルダ構造も維持。</td>
+                        <td><strong>5,940円</strong><br><span style="font-size: 0.8em; color: var(--text-muted);">(現行比: ＋3,300円)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>【案B】手動コピー</strong></td>
+                        <td>PC経由で直接ドラッグ＆ドロップ。<br>数日を要し、ネットワークエラーやデータ欠損のリスク大。</td>
+                        <td>0円</td>
+                    </tr>
+                    <tr>
+                        <td><strong>【案C】Google Workspace経由</strong></td>
+                        <td>法人用Googleドライブを経由。<br>Google側のツールもDropbox Standard必須のためこちらもStandardへのアップグレードが必須。</td>
+                        <td>5,940円</td>
+                    </tr>
+                    <tr>
+                        <td><strong>【案D】外付けHDD経由</strong></td>
+                        <td>物理HDDを購入し、一度ダウンロードしてからアップロード。<br>手動コピーの手間と機器代金がかかり、安全性も案Aに劣る。</td>
+                        <td>6,000円〜15,000円<br><span style="font-size: 0.8em;">(機器代金)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>3. 結論・費用申請</h2>
+            <p style="font-size: 0.95rem;">確実性、業務影響の最小化、作業工数の観点から、<strong>【案A】での進行を推奨</strong>。一時費用の承認をお願いしたいです。</p>
+
+            <div class="proposal-box">
+                <div>申請額: <span class="cost-amount">5,940円</span>（税込） <span style="font-size: 0.9em; color: var(--text-muted); margin-left: 8px;">※現行プラン(2,640円)からの実質追加費用は <strong>3,300円</strong></span></div>
+                <ul>
+                    <li><strong>内訳：</strong> Dropbox Standard 月間プラン<br>
+                    <span style="font-size: 0.9em; color: #475569;">※公式ツール連携に必要な「管理者機能」を開放するには、Dropboxの仕様上<strong>「最低3ユーザー分（1,980円×3人）」のセット契約が必須</strong>となるため。</span></li>
+                    <li><strong>期間：</strong> 移行作業を行う1ヶ月のみ</li>
+                    <li><strong>対応：</strong> 移行完了後、次回請求日までに解約（現行のEssentials: 2,640円 へ降格）し、追加課金を防止する</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
