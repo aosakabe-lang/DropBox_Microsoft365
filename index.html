@@ -1,121 +1,890 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dropboxデータ移行 提案書</title>
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-light: #eff6ff;
-            --text-main: #334155;
-            --text-muted: #64748b;
-            --bg-color: #f8fafc;
-            --surface-color: #ffffff;
-            --border-color: #e2e8f0;
-            --success-color: #10b981;
-            --success-light: #ecfdf5;
-            --warning-color: #f59e0b;
-            --warning-light: #fffbeb;
-        }
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.5;
-            margin: 0;
-            padding: 0;
-        }
-        .header-bar { background-color: var(--primary-color); height: 6px; }
-        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
-        .card {
-            background: var(--surface-color);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            padding: 30px;
-        }
-        h1 { font-size: 1.5rem; color: #0f172a; margin: 0 0 20px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        h2 { font-size: 1.1rem; color: #0f172a; margin: 24px 0 12px; border-left: 4px solid var(--primary-color); padding-left: 8px; }
-        .alert-box {
-            background-color: var(--warning-light);
-            border-left: 4px solid var(--warning-color);
-            padding: 12px 16px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.9rem; }
-        th, td { padding: 12px; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: top; }
-        th { background-color: #f1f5f9; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
-        .row-recommended { background-color: var(--primary-light); }
-        .badge {
-            display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 4px;
-        }
-        .badge-success { background-color: var(--success-light); color: var(--success-color); border: 1px solid #a7f3d0; }
-        .proposal-box { background-color: var(--success-light); border: 1px solid #a7f3d0; border-radius: 6px; padding: 20px; }
-        .cost-amount { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
-        ul { padding-left: 20px; margin: 10px 0 0; }
-        li { margin-bottom: 6px; font-size: 0.95rem; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropbox → Microsoft 365 データ移行計画書</title>
+  <style>
+    /* =========================================
+       Design System & Variables
+       ========================================= */
+    :root {
+      --primary: #0078d4;
+      --primary-light: #f3f9fd;
+      --primary-hover: #005a9e;
+      --accent: #00a4ef;
+      --success: #107c41;
+      --success-light: #e7f5ec;
+      --warning: #d83b01;
+      --warning-light: #fde7e9;
+      --purple: #5c2d91;
+      --purple-light: #f2e6f9;
+      --text-main: #201f1e;
+      --text-muted: #605e5c;
+      --bg-body: #f8f9fa;
+      --bg-card: #ffffff;
+      --border: #e1dfdd;
+      --radius: 12px;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", "Hiragino Sans", "Meiryo", sans-serif;
+      line-height: 1.7;
+      color: var(--text-main);
+      background-color: var(--bg-body);
+      padding: 40px 20px 80px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    /* =========================================
+       Hero Section
+       ========================================= */
+    .hero {
+      background: linear-gradient(135deg, #004578 0%, var(--primary) 100%);
+      color: #ffffff;
+      padding: 50px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      box-shadow: var(--shadow-md);
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+
+    /* =========================================
+       Summary Metrics
+       ========================================= */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 40px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      padding: 24px;
+      text-align: center;
+    }
+
+    .metric-label { font-size: 12.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; }
+    .metric-value { font-size: 16px; font-weight: 800; color: var(--primary); }
+
+    /* =========================================
+       Layout & Sections
+       ========================================= */
+    .section { margin-bottom: 50px; }
+    
+    .section-header {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      padding: 32px;
+      margin-bottom: 20px;
+    }
+
+    /* =========================================
+       Highlight Card (安全管理 & リワインド)
+       ========================================= */
+    .highlight-card {
+      background: linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .highlight-card h3 {
+      color: #004578;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid #cce4f7;
+      padding-bottom: 10px;
+    }
+
+    .highlight-card p {
+      font-size: 14.5px;
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+
+    .highlight-points {
+      background: #ffffff;
+      border: 1px solid #cce4f7;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 14px 0;
+    }
+
+    .highlight-points ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .highlight-points li {
+      position: relative;
+      padding-left: 24px;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .highlight-points li:last-child { margin-bottom: 0; }
+
+    .highlight-points li::before {
+      content: "🔹";
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 13px;
+    }
+
+    /* =========================================
+       Tools Grid
+       ========================================= */
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .tool-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      background: var(--bg-card);
+    }
+    .tool-box h4 { font-size: 16.5px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .tool-box p { font-size: 13.5px; color: var(--text-muted); }
+    
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 12px; }
+    .tag-purple { background: var(--purple-light); color: var(--purple); }
+    .tag-blue { background: #e5f0ff; color: #0052cc; }
+    .tag-green { background: var(--success-light); color: var(--success); }
+
+    /* Microsoft 365 Logo Icon */
+    .ms-logo {
+      display: inline-flex;
+      flex-wrap: wrap;
+      width: 14px;
+      height: 14px;
+      gap: 1.5px;
+    }
+    .ms-logo span { width: 6.25px; height: 6.25px; }
+    .ms-r { background: #f25022; }
+    .ms-g { background: #7fba00; }
+    .ms-b { background: #00a4ef; }
+    .ms-y { background: #ffb900; }
+
+    /* =========================================
+       Action Panel & Price Table
+       ========================================= */
+    .action-panel {
+      border: 1.5px solid var(--border);
+      background: #ffffff;
+    }
+
+    .action-panel h3 { color: var(--primary); font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    
+    .task-list { list-style: none; padding: 0; margin-bottom: 24px; }
+    .task-list li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .task-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 2px;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    /* Price Table UI */
+    .price-box {
+      background: #faf9f8;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-top: 14px;
+    }
+    .price-title { font-size: 13.5px; font-weight: bold; color: var(--text-main); margin-bottom: 8px; }
+    .price-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; }
+    .price-table th, .price-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .price-table th { background: #f3f2f1; font-weight: bold; color: var(--text-muted); }
+    .price-highlight { font-weight: bold; color: var(--primary); }
+
+    /* HDD Procedure Box */
+    .hdd-steps {
+      background: #ffffff;
+      border: 1px solid #e1dfdd;
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+    .hdd-steps-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .hdd-steps-time { background: #e5f0ff; color: #0052cc; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .hdd-steps-list { list-style: none; padding: 0; margin: 0; }
+    .hdd-steps-list li { position: relative; padding-left: 20px; margin-bottom: 6px; color: var(--text-main); }
+    .hdd-steps-list li:last-child { margin-bottom: 0; }
+    .hdd-steps-list li::before { content: "➔"; position: absolute; left: 0; color: var(--primary); font-size: 11px; }
+
+    /* 赤文字の警告承諾ボックス */
+    .warning-consent-box {
+      background: var(--warning-light);
+      border: 2px solid var(--warning);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 12px;
+    }
+    .warning-text {
+      color: var(--warning);
+      font-weight: 800;
+      font-size: 14.5px;
+      line-height: 1.7;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    /* =========================================
+       Form / Controls
+       ========================================= */
+    .form-group { margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border); }
+    .form-label { font-size: 15px; font-weight: 700; display: block; margin-bottom: 8px; }
+    .form-hint { font-size: 13px; color: var(--text-muted); font-weight: normal; margin-left: 4px; }
+    
+    /* Radio Option Group */
+    .radio-group { display: flex; gap: 16px; margin-top: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .radio-card {
+      flex: 1;
+      min-width: 200px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+    }
+    .radio-card:hover { border-color: var(--primary); background: var(--primary-light); }
+    .radio-card input[type="radio"] { accent-color: var(--primary); width: 18px; height: 18px; cursor: pointer; }
+    .radio-card-content { font-size: 14.5px; font-weight: bold; }
+    .radio-card-desc { font-size: 12px; color: var(--text-muted); font-weight: normal; margin-top: 2px; }
+
+    /* 赤枠のラジオカード */
+    .radio-card-warning {
+      border-color: #fca5a5;
+    }
+    .radio-card-warning:hover {
+      border-color: var(--warning);
+      background: #fff5f5;
+    }
+    .radio-card-warning input[type="radio"] {
+      accent-color: var(--warning);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+    textarea:focus { outline: none; border-color: var(--primary); }
+    .save-toast {
+      font-size: 13px; color: var(--success); font-weight: 700; margin-top: 8px;
+      display: none; align-items: center; gap: 4px;
+    }
+
+    /* =========================================
+       Gantt Chart (Roadmap)
+       ========================================= */
+    .gantt-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .gantt-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .gantt-row:last-child { margin-bottom: 0; }
+
+    .gantt-info { padding-right: 15px; }
+    .gantt-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+    .gantt-duration { font-size: 12.5px; color: var(--text-muted); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; background: var(--bg-body); padding: 2px 8px; border-radius: 4px; }
+
+    .gantt-track {
+      background: var(--bg-body);
+      height: 36px;
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .gantt-bar {
+      height: 100%;
+      border-radius: 18px;
+      position: absolute;
+      top: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 12.5px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .bar-1 { background: var(--border); color: var(--text-main); width: 25%; left: 0; }
+    .bar-2 { background: var(--primary); width: 50%; left: 20%; }
+    .bar-3 { background: var(--success); width: 25%; left: 75%; }
+
+    /* =========================================
+       Error Guidelines
+       ========================================= */
+    .error-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .error-card { border: 1px solid var(--border); border-radius: 8px; padding: 20px; background: var(--bg-card); }
+    .error-card h4 { font-size: 15px; color: var(--warning); margin-bottom: 12px; }
+    .ng-char { display: inline-block; background: var(--warning); color: #fff; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: bold; margin: 2px; }
+
+    /* =========================================
+       Buttons
+       ========================================= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14.5px;
+      padding: 14px 28px;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,120,212,0.25);
+    }
+    .btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+    @media (max-width: 768px) {
+      .gantt-row { grid-template-columns: 1fr; gap: 8px; margin-bottom: 24px; }
+      .gantt-track { height: 28px; }
+      .radio-group { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-    <div class="header-bar"></div>
-    <div class="container">
-        <div class="card">
-            <h1>Drop Boxデータ移行 提案書</h1>
 
-            <h2>1. 現状と課題</h2>
-            <p style="font-size: 0.95rem;">現行Dropbox Essentials（2,640円税込み）からの業務データ移行にあたり、Microsoft公式「移行マネージャー」の使用を計画していましたが、以下のエラーが発生しています。</p>
-            <div class="alert-box">
-                <strong>課題：</strong> 移行マネージャーの要件…管理者権限付Dropbox Standard以上。<br>現在のEssentialsプランでは連携不可。
-            </div>
+<div class="container">
+  
+  <!-- ヘッダー -->
+  <header class="hero">
+    <span class="hero-badge">Microsoft 365 移行プロジェクト</span>
+    <h1>Dropbox → Microsoft 365 データ移行計画書</h1>
+  </header>
 
-            <h2>2. 移行手法の比較</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>手法</th>
-                        <th>概要と評価</th>
-                        <th>コスト</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="row-recommended">
-                        <td><strong>【案A】Essentials→ Standard一時アップグレード</strong><br><span class="badge badge-success">候補</span></td>
-                        <td>1ヶ月のみDropbox Standardに変更し、公式ツールで直接転送。<br>PCに負荷をかけず最速・安全。フォルダ構造も維持。</td>
-                        <td><strong>5,940円</strong><br><span style="font-size: 0.8em; color: var(--text-muted);">(現行比: ＋3,300円)</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>【案B】手動コピー</strong></td>
-                        <td>PC経由で直接ドラッグ＆ドロップ。<br>数日を要し、ネットワークエラーやデータ欠損のリスク大。</td>
-                        <td>0円</td>
-                    </tr>
-                    <tr>
-                        <td><strong>【案C】Google Workspace経由</strong></td>
-                        <td>法人用Googleドライブを経由。<br>Google側のツールもDropbox Standard必須のためこちらもStandardへのアップグレードが必須。</td>
-                        <td>5,940円</td>
-                    </tr>
-                    <tr>
-                        <td><strong>【案D】外付けHDD経由</strong></td>
-                        <td>物理HDDを購入し、一度ダウンロードしてからアップロード。<br>手動コピーの手間と機器代金がかかり、安全性も案Aに劣る。</td>
-                        <td>6,000円〜15,000円<br><span style="font-size: 0.8em;">(機器代金)</span></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2>3. 結論・費用申請</h2>
-            <p style="font-size: 0.95rem;">確実性、業務影響の最小化、作業工数の観点から、<strong>【案A】での進行を推奨</strong>。一時費用の承認をお願いしたいです。</p>
-
-            <div class="proposal-box">
-                <div>申請額: <span class="cost-amount">5,940円</span>（税込） <span style="font-size: 0.9em; color: var(--text-muted); margin-left: 8px;">※現行プラン(2,640円)からの実質追加費用は <strong>3,300円</strong></span></div>
-                <ul>
-                    <li><strong>内訳：</strong> Dropbox Standard 月間プラン<br>
-                    <span style="font-size: 0.9em; color: #475569;">※公式ツール連携に必要な「管理者機能」を開放するには、Dropboxの仕様上<strong>「最低3ユーザー分（1,980円×3人）」のセット契約が必須</strong>となるため。</span></li>
-                    <li><strong>期間：</strong> 移行作業を行う1ヶ月のみ</li>
-                    <li><strong>対応：</strong> 移行完了後、次回請求日までに解約（現行のEssentials: 2,640円 へ降格）し、追加課金を防止する</li>
-                </ul>
-            </div>
-        </div>
+  <!-- KPI / サマリー -->
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-label">移行ツール</div>
+      <div class="metric-value">Microsoft公式ツール</div>
     </div>
+    <div class="metric-card">
+      <div class="metric-label">安全性</div>
+      <div class="metric-value">事前スキャン実施</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">データ追従</div>
+      <div class="metric-value">差分同期で自動化</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">業務影響</div>
+      <div class="metric-value">スキャン中、移行中の業務停止は基本なし</div>
+    </div>
+  </div>
+
+  <!-- 1. 主要ツール -->
+  <section class="section">
+    <h2 class="section-header">💡 登場する主要ツールの役割</h2>
+    <div class="tools-grid">
+      
+      <!-- 1. Dropbox -->
+      <div class="tool-box" style="border: 2px solid #0052cc;">
+        <span class="tag tag-blue">移行元</span>
+        <h4 style="color: #0052cc;">Dropbox</h4>
+        <p>現在利用中のストレージ。ここから新環境へデータを安全に引越しします。</p>
+      </div>
+
+      <!-- 2. Migration Manager -->
+      <div class="tool-box" style="border: 2px solid var(--purple); background: #faf8fc;">
+        <span class="tag tag-purple">移行ツール</span>
+        <h4 style="color: var(--purple);">
+          <div class="ms-logo"><span class="ms-r"></span><span class="ms-g"></span><span class="ms-b"></span><span class="ms-y"></span></div>
+          Migration Manager
+        </h4>
+        <p>Microsoft公式の全自動データ移行ツールです。バックグラウンドで安全にコピー作業を実行します。</p>
+      </div>
+      
+      <!-- 3. SharePoint -->
+      <div class="tool-box" style="border: 2px solid var(--success);">
+        <span class="tag tag-green">移行先</span>
+        <h4 style="color: var(--success);">
+          <div class="ms-logo"><span class="ms-r"></span><span class="ms-g"></span><span class="ms-b"></span><span class="ms-y"></span></div>
+          SharePoint
+        </h4>
+        <p>チーム全体の新しい共有フォルダ。ブラウザ上での同時編集やリンク共有が可能です。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 2. 安全管理とお願い事項 -->
+  <section class="section">
+    
+    <!-- ★ 安全管理とDropbox「リワインド機能」について -->
+    <div class="highlight-card">
+      <h3>🛡️ 安全管理とDropbox「リワインド機能」について</h3>
+      
+      <div class="highlight-points">
+        <ul>
+          <li><b>安全なコピー処理:</b> 元データを直接移動・削除せず、Microsoft公式移行ツールにて「クラウド間コピー」を実施いたします。</li>
+          <li><b>万が一の際の復元（リワインド機能）:</b> 作業中に意図しない削除やデータ破損が発生した場合でも、Dropboxの<b>「リワインド（Rewind）機能」</b>を使用することで、アカウント全体のデータを移行作業前の正常な状態（最長30日前）へ一括で安全に復元・巻き戻すことが可能です。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 🎯 リノアへのお願い・ご対応範囲 -->
+    <div class="card action-panel">
+      <h3>🎯 リノアへのお願い・ご対応範囲</h3>
+      <p style="font-size: 15px; margin-bottom: 20px;">今回の移行に際し、<b>リノア側でご対応いただく作業</b>は以下の点です。実際のシステム間データ移送などは全てこちらで実施いたします。</p>
+      
+      <ul class="task-list">
+        <li>① 【事前選択】外付けHDD等への別途バックアップ希望の選択（下記フォーム）</li>
+        <li>② 【事前確認】連携システムの有無のチェック・ご記入（下記フォーム）</li>
+        <li>③ 【事前確認】移行作業における免責事項の承諾（下記フォーム）</li>
+        <li>④ 【エラー修正】事前スキャンで禁止文字等のエラーが出た場合のファイル名修正</li>
+        <li>⑤ 【再設定】移行完了後、該当システムの参照先（Dropbox → SharePoint）の紐づけ直し</li>
+      </ul>
+
+      <!-- 入力フォーム 1：HDDバックアップの意思決定 -->
+      <div class="form-group">
+        <label class="form-label">
+          💾 意思決定：外付けHDD等への別途データバックアップの要否
+          <span class="form-hint">（移行作業前にDropboxの全データを別途ローカル環境へ保存するか選択してください）</span>
+        </label>
+        
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="hdd-backup" value="need" onchange="saveForm()">
+            <div>
+              <div class="radio-card-content">希望する（HDD等へ保存）</div>
+              <div class="radio-card-desc">念のため移行開始前に手元・ローカル環境へ全データをバックアップします。（※2TB HDD費用：約8,000円〜12,000円程度）</div>
+            </div>
+          </label>
+
+          <label class="radio-card">
+            <input type="radio" name="hdd-backup" value="none" onchange="saveForm()">
+            <div>
+              <div class="radio-card-content">希望しない（直接移行）</div>
+              <div class="radio-card-desc">Dropboxのリワインド機能・クラウド保護を前提とし、追加コスト無しでそのまま移行を実行します。</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- HDD費用および移行手順・日数（2TBに特化） -->
+        <div class="price-box">
+          <div class="price-title">📊 外付けHDD 2TB 導入費用目安</div>
+          <table class="price-table">
+            <thead>
+              <tr>
+                <th>タイプ / 容量</th>
+                <th>想定購入費用（税込）</th>
+                <th>特徴・用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>ポータブルHDD (2TB)</b> <span class="price-highlight">※推奨</span></td>
+                <td><b class="price-highlight">約 8,000円 〜 12,000円</b></td>
+                <td>USB給電・軽量コンパクトで持ち運びや作業に便利</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="hdd-steps">
+            <div class="hdd-steps-title">
+              <span>📂 HDDへバックアップする場合の手順と所要時間</span>
+              <span class="hdd-steps-time">⏱️ 所要目安: 約1日〜2日</span>
+            </div>
+            <ul class="hdd-steps-list">
+              <li><b>Step 1:</b> 外付けHDDをパソコン（またはサーバー）へUSB接続します。</li>
+              <li><b>Step 2:</b> Dropbox同期フォルダ内の全ファイルを外付けHDDへコピー（ドラッグ＆ドロップ）します。</li>
+              <li><b>Step 3:</b> データ量（最大2TB）の転送が完了するまでPCを起動したまま待機し、保存完了を確認します。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 入力フォーム 2：連携システムの有無 -->
+      <div class="form-group">
+        <label class="form-label">
+          ❓ 事前確認：Dropbox連携システムの有無
+          <span class="form-hint">（Dropbox内のファイルを参照している外部ツールやシステム等）</span>
+        </label>
+        <textarea id="system-input" placeholder="例：特になし / 会計ソフトの自動取込フォルダとして特定のパスを使用中 など" oninput="saveForm()"></textarea>
+      </div>
+
+      <!-- 入力フォーム 3：一番下へ配置した赤文字の免責事項＆承諾ラジオボタン（新規追加） -->
+      <div class="form-group">
+        <label class="form-label">
+          ⚠️ 事前承諾：データ移行に関する留意・免責事項
+        </label>
+
+        <div class="warning-consent-box">
+          <div class="warning-text">
+            <span>⚠️</span>
+            <span>クラウド側の突発的な障害等に備え「100%絶対の保障」はいたしかねますため、あらかじめご了承のうえご協力をお願いいたします。</span>
+          </div>
+
+          <div class="radio-group" style="margin-bottom: 0;">
+            <label class="radio-card radio-card-warning">
+              <input type="radio" name="disclaimer-agree" value="yes" onchange="saveForm()">
+              <div class="radio-card-content" style="color: var(--warning);">はい（承諾する）</div>
+            </label>
+
+            <label class="radio-card radio-card-warning">
+              <input type="radio" name="disclaimer-agree" value="no" onchange="saveForm()">
+              <div class="radio-card-content" style="color: var(--warning);">いいえ（承諾しない）</div>
+            </label>
+          </div>
+        </div>
+        
+        <div id="save-status" class="save-toast" style="margin-top: 12px;">✓ 入力内容はブラウザに自動保存されました</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 3. ロードマップ（ガントチャート風） -->
+  <section class="section">
+    <h2 class="section-header">🗓️ 移行ロードマップ・所要時間目安</h2>
+    <div class="gantt-wrapper">
+      
+      <!-- Phase 1 -->
+      <div class="gantt-row">
+        <div class="gantt-info">
+          <div class="gantt-title">Phase 01: 事前準備・スキャン</div>
+          <div class="gantt-duration">⏱️ 目安: 数日程度</div>
+        </div>
+        <div class="gantt-track">
+          <div class="gantt-bar bar-1">スキャン・エラー修正・バックアップ</div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="gantt-row">
+        <div class="gantt-info">
+          <div class="gantt-title">Phase 02: 本番一括コピー</div>
+          <div class="gantt-duration">⏱️ 目安: 数日間～2週間 (全自動)</div>
+        </div>
+        <div class="gantt-track">
+          <div class="gantt-bar bar-2">バックグラウンド自動転送（業務影響なし）</div>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="gantt-row">
+        <div class="gantt-info">
+          <div class="gantt-title">Phase 03: 差分同期・切替</div>
+          <div class="gantt-duration">⏱️ 目安: 1日</div>
+        </div>
+        <div class="gantt-track">
+          <div class="gantt-bar bar-3">最終同期・運用開始</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. エラー対策ガイドライン -->
+  <section class="section">
+    <h2 class="section-header">⚠️ エラー対策ルール（エラー検出時のみ対応）</h2>
+    <div class="error-grid">
+      <div class="error-card">
+        <h4>1. ファイル名の使用禁止記号</h4>
+        <p style="font-size: 13.5px; margin-bottom: 12px;">SharePointでは以下の記号を含む名前はエラーになります。</p>
+        <div style="margin-bottom: 12px;">
+          <span class="ng-char">"</span><span class="ng-char">*</span><span class="ng-char">:</span><span class="ng-char">&lt;</span><span class="ng-char">&gt;</span><span class="ng-char">?</span><span class="ng-char">/</span><span class="ng-char">\</span><span class="ng-char">|</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted);">❌ 売上:2026.xlsx<br>⭕ 売上-2026.xlsx（ハイフン等に変更）</p>
+      </div>
+
+      <div class="error-card">
+        <h4>2. フォルダ階層の文字数制限</h4>
+        <p style="font-size: 13.5px; margin-bottom: 12px;">「サイト名＋フォルダ名＋ファイル名」の合計が長すぎると保存できません。</p>
+        <p style="font-size: 13px; color: var(--text-muted);">
+          ❌ .../2026年度/営業部/関東/PJ/最終提案書.pptx<br>
+          ⭕ .../2026_営業/PJ/提案書.pptx（階層を浅く・短く）
+        </p>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 50px;">
+      <button class="btn" onclick="openGuide()">📖 新しい使い方：SharePoint 基本ガイドを開く</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- JavaScript -->
+<script>
+  // フォーム値の保存と復元
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. テキスト入力の復元
+    const input = document.getElementById('system-input');
+    if (input) {
+      input.value = localStorage.getItem('dp_migration_memo') || '';
+    }
+
+    // 2. HDDラジオボタンの復元
+    const savedHdd = localStorage.getItem('dp_migration_hdd');
+    if (savedHdd) {
+      const radio = document.querySelector(`input[name="hdd-backup"][value="${savedHdd}"]`);
+      if (radio) radio.checked = true;
+    }
+
+    // 3. 免責同意ラジオボタンの復元
+    const savedAgree = localStorage.getItem('dp_migration_agree');
+    if (savedAgree) {
+      const radio = document.querySelector(`input[name="disclaimer-agree"][value="${savedAgree}"]`);
+      if (radio) radio.checked = true;
+    }
+  });
+
+  // 保存処理
+  function saveForm() {
+    const input = document.getElementById('system-input');
+    const toast = document.getElementById('save-status');
+    const selectedHdd = document.querySelector('input[name="hdd-backup"]:checked');
+    const selectedAgree = document.querySelector('input[name="disclaimer-agree"]:checked');
+
+    if (input) {
+      localStorage.setItem('dp_migration_memo', input.value);
+    }
+    if (selectedHdd) {
+      localStorage.setItem('dp_migration_hdd', selectedHdd.value);
+    }
+    if (selectedAgree) {
+      localStorage.setItem('dp_migration_agree', selectedAgree.value);
+    }
+
+    if (toast) {
+      toast.style.display = 'inline-flex';
+      clearTimeout(window.saveTimer);
+      window.saveTimer = setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    }
+  }
+
+  // SharePointガイド展開
+  function openGuide() {
+    const win = window.open("", "_blank");
+    if (!win) return;
+    win.document.write(`
+      <!DOCTYPE html>
+      <html lang="ja">
+      <head>
+        <meta charset="UTF-8">
+        <title>SharePoint 基本使い方ガイド</title>
+        <style>
+          body { font-family: "Segoe UI", sans-serif; line-height: 1.7; padding: 40px 20px; max-width: 900px; margin: 0 auto; color: #201f1e; background-color: #faf9f8; }
+          h1 { color: #0078d4; border-bottom: 2px solid #0078d4; padding-bottom: 12px; margin-bottom: 30px; font-size: 26px; }
+          h2 { color: #201f1e; font-size: 20px; margin-top: 40px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+          p { margin-bottom: 16px; color: #323130; }
+          
+          .box-recommend { background: #f3f9fd; border-left: 5px solid #0078d4; border-radius: 8px; padding: 24px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+          .box-recommend h3 { color: #004578; margin-top: 0; font-size: 18px; margin-bottom: 10px; }
+          
+          .sp-mockup { display: flex; border: 1px solid #e1dfdd; border-radius: 8px; overflow: hidden; margin: 30px 0; background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,0.08); font-size: 14px; }
+          .sp-sidebar { width: 220px; background: #f3f2f1; padding: 15px; border-right: 1px solid #e1dfdd; color: #605e5c; }
+          .sp-sidebar ul { list-style: none; padding: 0; margin: 0; }
+          .sp-sidebar li { padding: 10px 15px; margin-bottom: 4px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+          .sp-sidebar li.active { background: #e1dfdd; font-weight: bold; color: #201f1e; }
+          .sp-main { flex: 1; }
+          .sp-toolbar { padding: 12px 20px; border-bottom: 1px solid #e1dfdd; background: #faf9f8; display: flex; gap: 15px; color: #0078d4; font-weight: bold; font-size: 13.5px; }
+          .sp-toolbar-item { cursor: pointer; display: flex; align-items: center; gap: 5px; }
+          .sp-header { padding: 15px 20px; font-size: 22px; font-weight: 600; color: #201f1e; }
+          
+          .sp-list { width: 100%; border-collapse: collapse; }
+          .sp-list th { text-align: left; padding: 12px 20px; border-bottom: 1px solid #e1dfdd; color: #605e5c; font-weight: normal; font-size: 13px; }
+          .sp-list td { padding: 12px 20px; border-bottom: 1px solid #f3f2f1; color: #201f1e; }
+          .sp-list tr:hover { background: #f3f9fd; cursor: pointer; }
+          
+          .icon { font-size: 18px; margin-right: 8px; vertical-align: middle; }
+          .icon-folder { color: #fce100; text-shadow: 0 1px 1px rgba(0,0,0,0.2); }
+          .icon-word { color: #2b579a; }
+          .icon-excel { color: #107c41; }
+          
+          .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+          .step-card { background: #fff; border: 1px solid #e1dfdd; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+          .step-card h4 { color: #0078d4; margin-top: 0; margin-bottom: 12px; font-size: 16px; border-bottom: 1px solid #f3f2f1; padding-bottom: 8px; }
+          
+          .qa-box { background: #fff; border: 1px solid #e1dfdd; border-radius: 8px; padding: 25px; }
+          .q { font-weight: bold; color: #d83b01; margin-top: 20px; display: flex; align-items: flex-start; gap: 8px; }
+          .q:first-child { margin-top: 0; }
+          .a { margin-left: 24px; color: #323130; margin-top: 6px; }
+        </style>
+      </head>
+      <body>
+        <h1>📘 SharePoint 基本使い方ガイド</h1>
+        
+        <div class="box-recommend">
+          <h3>✨ 推奨スタイル：Webブラウザでの操作・リアルタイム同時編集</h3>
+          <p>SharePointは <b>Webブラウザ（Chrome や Edge）</b> で開いて作業するのが最も便利で安全です。<br>手動での「上書き保存」は不要（全自動保存）になり、「誰かが開いていて編集できない」というロック状態も解消され、複数人での同時編集が可能になります。</p>
+        </div>
+
+        <h2>💻 画面の見方と基本イメージ</h2>
+        <p>SharePointの「ドキュメント」を開くと、以下のような画面が表示されます。見た目はパソコンのエクスプローラーによく似ており、クリックするだけで直感的に操作できます。</p>
+
+        <div class="sp-mockup">
+          <div class="sp-sidebar">
+            <ul>
+              <li>🏠 ホーム</li>
+              <li class="active">📁 ドキュメント</li>
+              <li>📄 共有されている項目</li>
+              <li>🗑️ ごみ箱</li>
+            </ul>
+          </div>
+          <div class="sp-main">
+            <div class="sp-toolbar">
+              <div class="sp-toolbar-item">➕ 新規 ⌄</div>
+              <div class="sp-toolbar-item">⬆️ アップロード ⌄</div>
+              <div class="sp-toolbar-item">🔗 リンクをコピー</div>
+            </div>
+            <div class="sp-header">ドキュメント (移行データ)</div>
+            <table class="sp-list">
+              <thead>
+                <tr>
+                  <th>名前</th>
+                  <th>更新日時</th>
+                  <th>更新者</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="icon icon-folder">📁</span> 01_営業部_提案資料</td>
+                  <td>2時間前</td>
+                  <td>佐藤 太郎</td>
+                </tr>
+                <tr>
+                  <td><span class="icon icon-folder">📁</span> 02_経理部_月次報告</td>
+                  <td>昨日</td>
+                  <td>鈴木 花子</td>
+                </tr>
+                <tr>
+                  <td><span class="icon icon-word">📄</span> 2026年度_事業計画書.docx</td>
+                  <td>3日前</td>
+                  <td>佐藤 太郎</td>
+                </tr>
+                <tr>
+                  <td><span class="icon icon-excel">📊</span> 予算管理表_最新版.xlsx</td>
+                  <td>1週間前</td>
+                  <td>田中 一郎</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2>🔄 よく使う基本操作</h2>
+        <div class="grid-cards">
+          <div class="step-card">
+            <h4>ファイルを開いて編集する</h4>
+            <p>ファイル名を<b>左クリックするだけ</b>で、ブラウザ上のWordやExcelが起動し、すぐに編集がスタートできます。編集内容は自動で保存されます。</p>
+          </div>
+          <div class="step-card">
+            <h4>新しいファイルをアップロード</h4>
+            <p>自分のパソコンにあるファイルを、ブラウザの<b>画面内に直接ドラッグ＆ドロップ</b>するだけで、簡単にSharePointへ保存できます。</p>
+          </div>
+          <div class="step-card">
+            <h4>PCアプリ（デスクトップ版）で開く</h4>
+            <p>マクロ（VBA）を使うなど、高度な編集が必要な場合は、画面上部のメニューから<b>「デスクトップ アプリで開く」</b>を選択すると、いつものExcel等で直接開けます。</p>
+          </div>
+          <div class="step-card">
+            <h4>メンバーに共有する</h4>
+            <p>対象のファイルの横にある「🔗（共有アイコン）」をクリックし、「リンクをコピー」してチャット等で送るだけで、安全に最新版を共有できます。</p>
+          </div>
+        </div>
+
+        <h2>❓ 困ったときのトラブルシューティング</h2>
+        <div class="qa-box">
+          <div class="q">Q. 誤ってデータを書き換えてしまった・消してしまった（過去に戻したい）</div>
+          <div class="a">
+            対象のファイルを右クリックして <b>「バージョン履歴」</b> を選択してください。過去の編集・保存履歴が一覧で表示されますので、戻したい日時の横にある「復元」をクリックするだけで、一瞬で過去の状態に戻せます。
+          </div>
+          
+          <div class="q">Q. ファイルやフォルダ自体を誤って削除してしまった</div>
+          <div class="a">
+            画面左側のメニューにある <b>「ごみ箱」</b> をクリックしてください。削除されたデータが一定期間保管されていますので、対象にチェックを入れて上部の「復元」を押せば元の場所に戻ります。
+          </div>
+        </div>
+      </body>
+      </html>
+    `);
+    win.document.close();
+  }
+</script>
+
 </body>
 </html>
