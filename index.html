@@ -117,6 +117,48 @@
     }
 
     /* =========================================
+       Evidence Card (非破壊転送のみ)
+       ========================================= */
+    .evidence-single-card {
+      background: #ffffff;
+      border: 1px solid #cce4f7;
+      border-left: 5px solid var(--success);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin-top: 16px;
+    }
+
+    .evidence-single-card h4 {
+      font-size: 15.5px;
+      color: var(--success);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .evidence-single-card p {
+      font-size: 13.5px;
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+
+    /* Schedule Badge */
+    .schedule-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff8e6;
+      border: 1px solid #ffe58f;
+      color: #d48806;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-top: 10px;
+    }
+
+    /* =========================================
        Highlight Card (安全管理 & リワインド)
        ========================================= */
     .highlight-card {
@@ -451,7 +493,7 @@
     </div>
     <div class="metric-card">
       <div class="metric-label">業務影響</div>
-      <div class="metric-value">スキャン中、移行中の業務停止は基本なし</div>
+      <div class="metric-value">移行中の停止ゼロ</div>
     </div>
   </div>
 
@@ -490,18 +532,30 @@
     </div>
   </section>
 
-  <!-- 2. 安全管理とお願い事項 -->
+  <!-- 2. 安全管理と安全性エビデンス -->
   <section class="section">
     
     <!-- ★ 安全管理とDropbox「リワインド機能」について -->
     <div class="highlight-card">
-      <h3>🛡️ 安全管理とDropbox「リワインド機能」について</h3>
+      <h3>🛡️ 安全管理とデータ移行の安全性について</h3>
       
       <div class="highlight-points">
         <ul>
           <li><b>安全なコピー処理:</b> 元データを直接移動・削除せず、Microsoft公式移行ツールにて「クラウド間コピー」を実施いたします。</li>
           <li><b>万が一の際の復元（リワインド機能）:</b> 作業中に意図しない削除やデータ破損が発生した場合でも、Dropboxの<b>「リワインド（Rewind）機能」</b>を使用することで、アカウント全体のデータを移行作業前の正常な状態（最長30日前）へ一括で安全に復元・巻き戻すことが可能です。</li>
         </ul>
+      </div>
+
+      <!-- 非破壊転送（読み取り専用）の説明 ＋ 開始スケジュールの記載 -->
+      <div class="evidence-single-card">
+        <h4>🔒 非破壊転送（読み取り専用処理）の技術的説明</h4>
+        <p>
+          Microsoft Migration Managerは移行元のDropboxデータに対して<b>「参照・コピー（読み取り専用）」のみ</b>を行います。<br>
+          元データの変更・削除・書き換え処理はシステム上一切発生しないため、移行作業によってDropbox内のデータが損なわれる心配はありません。
+        </p>
+        <div class="schedule-badge">
+          <span>📅 スケジュール:</span> 事前スキャンおよび本番データコピー（移行開始）は<b>【金曜午後】</b>に実施いたします。
+        </div>
       </div>
     </div>
 
@@ -586,7 +640,7 @@
         <textarea id="system-input" placeholder="例：特になし / 会計ソフトの自動取込フォルダとして特定のパスを使用中 など" oninput="saveForm()"></textarea>
       </div>
 
-      <!-- 入力フォーム 3：一番下へ配置した赤文字の免責事項＆承諾ラジオボタン（新規追加） -->
+      <!-- 入力フォーム 3：一番下へ配置した赤文字の免責事項＆承諾ラジオボタン -->
       <div class="form-group">
         <label class="form-label">
           ⚠️ 事前承諾：データ移行に関する留意・免責事項
@@ -626,10 +680,10 @@
       <div class="gantt-row">
         <div class="gantt-info">
           <div class="gantt-title">Phase 01: 事前準備・スキャン</div>
-          <div class="gantt-duration">⏱️ 目安: 数日程度</div>
+          <div class="gantt-duration">⏱️ 金曜午後スタート</div>
         </div>
         <div class="gantt-track">
-          <div class="gantt-bar bar-1">スキャン・エラー修正・バックアップ</div>
+          <div class="gantt-bar bar-1">スキャン・エラー確認・HDD退避（行う場合のみ）</div>
         </div>
       </div>
 
@@ -637,10 +691,10 @@
       <div class="gantt-row">
         <div class="gantt-info">
           <div class="gantt-title">Phase 02: 本番一括コピー</div>
-          <div class="gantt-duration">⏱️ 目安: 数日間～2週間 (全自動)</div>
+          <div class="gantt-duration">⏱️ 金曜午後～（全自動）</div>
         </div>
         <div class="gantt-track">
-          <div class="gantt-bar bar-2">バックグラウンド自動転送（業務影響なし）</div>
+          <div class="gantt-bar bar-2">バックグラウンド転送（業務影響なし）</div>
         </div>
       </div>
 
